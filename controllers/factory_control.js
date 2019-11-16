@@ -14,7 +14,7 @@ module.exports={
         var count;
         web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function(v){
         count=v;
-        var minimum=req.body.min;
+        var minimum=req.body.funds;
         var name=req.body.name;
         var about=req.body.about;
         var idea=req.body.idea;
