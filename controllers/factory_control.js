@@ -6,7 +6,7 @@ const compiledCampf=require('../build/CampaignFactory.json');
 const contractABI=JSON.parse(compiledCampf.interface);
 const compiledCamp=require('../build/Campaign.json');
 const contractABIc=JSON.parse(compiledCamp.interface);
-var contractAddress='0x6E5cc6982127216143cCae41c85fA7644394c6D1';
+var contractAddress='0x21fb434dc27c1ebcc701e0FcE9e532c8aF8aD35e';
 var contract=new web3js.eth.Contract(contractABI,contractAddress);
 module.exports={
 

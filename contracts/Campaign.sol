@@ -76,7 +76,7 @@ contract Campaign {
         request.approvals[msg.sender] = true;
         request.approvalCount++;
     }
-
+    
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
 
@@ -98,7 +98,6 @@ contract Campaign {
           manager
         );
     }
-
     function getRequestsCount() public view returns (uint) {
         return requests.length;
     }
