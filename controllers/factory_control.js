@@ -37,28 +37,15 @@ module.exports = {
         var obj={};
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
-                var func = () => {
+                var func = async() => {
                     for (i = 0; i < adata.length && i < 12; i++) {
-                        var contracti = new web3js.eth.Contract(contractABIc, adata[i]);
-                        obj.adata=adata[i];
-                        contracti.methods.namec().call()
-                            .then(function (data) {
-                                obj.name = data;
-                                contracti.methods.ideac().call()
-                            .then(function (data) {
-                                obj.idea = data;
-                                contracti.methods.goalc().call()
-                                    .then(function (data) {
-                                        obj.goal = data;
-                                        web3js.eth.getBalance(obj.adata)
-                                            .then(function (data) {
-                                                obj.balance = Number(data) / Math.pow(10, 18);
-                                                arr.push(obj);
-                                                obj={};
-                                            })
-                                    })
-                            })
-                    })
+                        var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
+                        obj.name=await contracti.methods.namec().call()
+                        obj.idea=await contracti.methods.ideac().call()
+                        obj.balance=await web3js.eth.getBalance(adata[i]);
+                        obj.goal=await contracti.methods.goalc().call()
+                        arr.push(obj);
+                        obj={};
     }
     return arr;
 }
