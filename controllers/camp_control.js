@@ -4,20 +4,39 @@ const Tx = require('ethereumjs-tx').Transaction;
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCamp=require('../build/Campaign.json');
 const contractABIc=JSON.parse(compiledCamp.interface);
-var contractAddress='0x21fb434dc27c1ebcc701e0FcE9e532c8aF8aD35e';
+var contractAddress='0xb5CB8947e5C05c3250324401F1769552d37Ad539';
 module.exports={    
     getDeployedCampaignd(req,res,next){
         var address=req.params.address;
         var contract=new web3js.eth.Contract(contractABIc,address);
-        var name;
-        var minimum;
+        var obj={};
         contract.methods.namec().call()
             .then(function(data){
-                name=data;
+                obj.name=data;
                 contract.methods.minimumContribution().call()
-                .then(function(rest){
-                    minimum=rest;
-                    res.send(minimum);
+                .then(function(data){
+                    obj.minimum=data;
+                    contract.methods.ideac().call()
+                    .then(function(data){
+                        obj.idea=data;
+                        contract.methods.aboutc().call()
+                        .then(function(data){
+                            obj.about=data;
+                            contract.methods.prod_descc().call()
+                            .then(function(data){
+                                obj.prod_desc=data;
+                                contract.methods.prod_descc().call()
+                                .then(function(data){
+                                    obj.proj_type=data;
+                                    web3js.eth.getBalance(address)
+                                    .then(function(data){
+                                        obj.balance=Number(data)/Math.pow(10,18);
+                                        res.send(obj);
+                                    })
+                                })
+                            })
+                        })
+                    })                 
                 })    
             })
             .catch(function(err){

@@ -3,8 +3,8 @@ pragma solidity ^0.4.17;
 contract CampaignFactory {
     address[] public deployedCampaigns;
 
-    function createCampaign(uint minimum,string name,string about,string idea,string prod_desc,string proj_type) public {
-        address newCampaign = new Campaign(minimum,name,about,idea,prod_desc,proj_type,msg.sender);
+    function createCampaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type) public {
+        address newCampaign = new Campaign(goal,minimum,name,about,idea,prod_desc,proj_type,msg.sender);
         deployedCampaigns.push(newCampaign);
     }
 
@@ -26,6 +26,7 @@ contract Campaign {
     Request[] public requests;
     address public manager;
     uint public minimumContribution;
+    uint public goalc;
     mapping(address => bool) public approvers;
     uint public approversCount;
     string public namec;
@@ -38,8 +39,9 @@ contract Campaign {
         _;
     }
 
-    function Campaign(uint minimum,string name,string about,string idea,string prod_desc,string proj_type,address creator) public {
+    function Campaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type,address creator) public {
         manager = creator;
+        goalc=goal;
         minimumContribution = minimum;
         ideac=idea;
         aboutc=about;
