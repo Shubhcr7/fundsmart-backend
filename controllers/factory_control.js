@@ -40,6 +40,7 @@ module.exports = {
                 var func = () => {
                     for (i = 0; i < adata.length && i < 12; i++) {
                         var contracti = new web3js.eth.Contract(contractABIc, adata[i]);
+                        obj.adata=adata[i];
                         contracti.methods.namec().call()
                             .then(function (data) {
                                 obj.name = data;
@@ -49,7 +50,7 @@ module.exports = {
                                 contracti.methods.goalc().call()
                                     .then(function (data) {
                                         obj.goal = data;
-                                        web3js.eth.getBalance(adata[i])
+                                        web3js.eth.getBalance(obj.adata)
                                             .then(function (data) {
                                                 obj.balance = Number(data) / Math.pow(10, 18);
                                                 arr.push(obj);
