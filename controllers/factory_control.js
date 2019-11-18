@@ -1,5 +1,6 @@
 const Web3 = require('web3');
 const http = require('http');
+const _=require('lodash');
 const Tx = require('ethereumjs-tx').Transaction;
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCampf = require('../build/CampaignFactory.json');
@@ -34,27 +35,103 @@ module.exports = {
 
     getDeployedCampaignf(req, res, next) {
         var arr = [];
-        var obj={};
+        var obj = {};
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
-                var func = async() => {
+                var func = async () => {
                     for (i = 0; i < adata.length && i < 12; i++) {
                         var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
-                        obj.name=await contracti.methods.namec().call()
-                        obj.idea=await contracti.methods.ideac().call()
-                        obj.balance=await web3js.eth.getBalance(adata[i]);
-                        obj.goal=await contracti.methods.goalc().call()
+                        obj.name = await contracti.methods.namec().call()
+                        obj.idea = await contracti.methods.ideac().call()
+                        obj.balance = await web3js.eth.getBalance(adata[i]);
+                        obj.goal = await contracti.methods.goalc().call();
+                        obj.manager=await contracti.methods.manager().call();
+                        obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.address=adata[i];
                         arr.push(obj);
-                        obj={};
-    }
-    return arr;
-}
-func().then((arrd) => {
-    res.send(arrd);
-});
+                        obj = {};
+                    }
+                    return arr;
+                }
+                func().then((arrd) => {
+                    res.send(arrd);
+                });
+            })
+            .catch(function (err) {
+                res.send(err);
+            })
+    },
+
+    getDeployedCampaignCat(req, res, next) {
+        var arr = [];
+        var obj = {};
+        var i;
+        var title=req.params.name;
+        contract.methods.getDeployedCampaigns().call()
+            .then(function (adata) {
+                var func = async () => {
+                    console.log(adata.length);
+                    for (i = 0; i < adata.length && i < 12; i++) {
+                        var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
+                        obj.name = await contracti.methods.namec().call()
+                        obj.idea = await contracti.methods.ideac().call()
+                        obj.balance = await web3js.eth.getBalance(adata[i]);
+                        obj.goal = await contracti.methods.goalc().call();
+                        obj.manager=await contracti.methods.manager().call();
+                        obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.address=adata[i];
+                        arr.push(obj);
+                        obj = {};
+                    }
+                    return arr;
+                }
+                func().then((arrd) => {
+                    arrd=_.filter(arrd, function(o) {
+                        return o.proj_type === title;
+                    })
+                    res.send(arrd);
                 })
-                .catch (function (err) {
-    res.send(err);
-})
+            })
+            .catch(function (err) {
+                res.send(err);
+            })
+    },
+
+    getPopular(req,res,next){
+        var i;
+        var k;
+        var arrk=[];
+        var arri = [];
+        var obj = {};
+        contract.methods.getDeployedCampaigns().call()
+            .then(function(arr){
+                var func=async()=>{
+                    for(i=0;i<arr.length;i++){
+                        var contracti = await new web3js.eth.Contract(contractABIc, arr[i]);
+                        obj.name = await contracti.methods.namec().call()
+                        obj.idea = await contracti.methods.ideac().call()
+                        obj.balance = await web3js.eth.getBalance(arr[i]);
+                        obj.goal = await contracti.methods.goalc().call();
+                        obj.manager=await contracti.methods.manager().call();
+                        obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.address=arr[i];
+                        arri.push(obj);
+                        obj = {};   
+                    }
+                    return arri;
+                }
+                func().then((arrd) => {
+                    arrd = _.orderBy(arrd, ['balance'],['desc']);
+                    return arrd;
+                }).then((arrd)=>{
+                    for(k=0;k<5;k++){
+                        arrk.push(arrd[k]);
+                    }
+                    res.send(arrk);
+                })
+            })
+            .catch(function(err){
+                res.send(err);
+            })
     }
 }
