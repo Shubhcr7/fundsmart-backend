@@ -10,27 +10,58 @@ const contractABIc = JSON.parse(compiledCamp.interface);
 var contractAddress = '0xb5CB8947e5C05c3250324401F1769552d37Ad539';
 var contract = new web3js.eth.Contract(contractABI, contractAddress);
 module.exports = {
-
-    createCamp(req, res, next) {
-        var count;
-        web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function (v) {
-            count = v;
-            var goal = req.body.goal;
-            var minimum = req.body.funds;
-            var name = req.body.name;
-            var about = req.body.about;
-            var idea = req.body.idea;
-            var prod_desc = req.body.prod_desc;
-            var proj_type = req.body.proj_type;
-            var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
-            var rawT = { "from": 0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal, minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
-            var transaction = new Tx(rawT, { chain: 'rinkeby', hardfork: 'petersburg' });
-            transaction.sign(privateKey);
-            web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
-                .then(function (transactionHash) {
-                    res.send(transactionHash);
-                });
-        });
+    
+    createCamp(req,res,next){
+        var i;
+        var k;
+        var arrk=[];
+        var arri = [];
+        var obj = {};
+        contract.methods.getDeployedCampaigns().call()
+            .then(function(arr){
+                var func=async()=>{
+                    for(i=0;i<arr.length;i++){
+                        var contracti = await new web3js.eth.Contract(contractABIc, arr[i]);
+                        obj.name = await contracti.methods.namec().call()
+                        obj.address=arr[i];
+                        arri.push(obj);
+                        obj = {};   
+                    }
+                    return arri;
+                }
+                func().then((arrd) => {
+                    var namec=req.body.name;
+                    arrd = _.find(arrd,{name:namec});
+                    console.log(arrd);
+                    if(arrd==undefined){
+                        var count;
+                        web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function (v) {
+                            count = v;
+                            var goal = req.body.goal;
+                            var minimum = req.body.funds;
+                            var name = namec;
+                            var about = req.body.about;
+                            var idea = req.body.idea;
+                            var prod_desc = req.body.prod_desc;
+                            var proj_type = req.body.proj_type;
+                            var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
+                            var rawT = { "from": 0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal, minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
+                            var transaction = new Tx(rawT, { chain: 'rinkeby', hardfork: 'petersburg' });
+                            transaction.sign(privateKey);
+                            web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+                                .then(function (transactionHash) {
+                                    res.send(transactionHash);
+                                });
+                        });
+                    }
+                    else{
+                        res.send('Already Exist');
+                    }
+                })
+            })
+            .catch(function(err){
+                res.send(err);
+            })
     },
 
     getDeployedCampaignf(req, res, next) {
@@ -47,6 +78,7 @@ module.exports = {
                         obj.goal = await contracti.methods.goalc().call();
                         obj.manager=await contracti.methods.manager().call();
                         obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.minimum=await contracti.methods.minimumContribution().call()
                         obj.address=adata[i];
                         arr.push(obj);
                         obj = {};
@@ -128,6 +160,43 @@ module.exports = {
                         arrk.push(arrd[k]);
                     }
                     res.send(arrk);
+                })
+            })
+            .catch(function(err){
+                res.send(err);
+            })
+    },
+
+    searchCamp(req,res,next){
+        var namec=req.params.name;
+        var i;
+        var k;
+        var arrk=[];
+        var arri = [];
+        var obj = {};
+        contract.methods.getDeployedCampaigns().call()
+            .then(function(arr){
+                var func=async()=>{
+                    for(i=0;i<arr.length;i++){
+                        var contracti = await new web3js.eth.Contract(contractABIc, arr[i]);
+                        obj.name = await contracti.methods.namec().call()
+                        obj.idea = await contracti.methods.ideac().call()
+                        obj.balance = await web3js.eth.getBalance(arr[i]);
+                        obj.goal = await contracti.methods.goalc().call();
+                        obj.manager=await contracti.methods.manager().call();
+                        obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.address=arr[i];
+                        arri.push(obj);
+                        obj = {};   
+                    }
+                    return arri;
+                }
+                func().then((arrd) => {
+                    arrd = _.find(arrd,{name:namec});
+                    if(arrd==undefined){
+                        res.send('error');
+                    }
+                    res.send(arrd);
                 })
             })
             .catch(function(err){

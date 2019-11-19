@@ -46,20 +46,31 @@ module.exports={
 
     contributeC(req,res,next){
         var count;
-        web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function(v){
-        count=v;
-        var value=req.body.value;
         var address=req.params.address;
-        var contract=new web3js.eth.Contract(contractABIc,address);
-        var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
-        var rawT={"from":0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259,"to":address,"value":web3js.utils.toHex(value),"gasPrice":web3js.utils.toHex(20* 1e9),"gasLimit":web3js.utils.toHex(3100000),"data":contract.methods.contribute().encodeABI(),"nonce":web3js.utils.toHex(count)};
-        var transaction = new Tx(rawT,{chain:'rinkeby', hardfork: 'petersburg'});            
-        transaction.sign(privateKey);
-        web3js.eth.sendSignedTransaction('0x'+transaction.serialize().toString('hex'))
-                    .then(function(transactionHash){
-                        res.send(transactionHash);
-                    });
-        });
+        var value=req.body.value;
+        var contract=new web3js.eth.Contract(contractABIc,address)
+        var func=async()=>{
+            var min=await contract.methods.minimumContribution().call();
+            return min;
+        }
+        func().then(function(min){
+            if(value>=min){
+                    web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function(v){
+                        count=v;
+                        var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
+                        var rawT={"from":0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259,"to":address,"value":web3js.utils.toHex(value),"gasPrice":web3js.utils.toHex(20* 1e9),"gasLimit":web3js.utils.toHex(4100000),"data":contract.methods.contribute().encodeABI(),"nonce":web3js.utils.toHex(count)};
+                        var transaction = new Tx(rawT,{chain:'rinkeby', hardfork: 'petersburg'});            
+                        transaction.sign(privateKey);
+                        web3js.eth.sendSignedTransaction('0x'+transaction.serialize().toString('hex'))
+                                    .then(function(transactionHash){
+                                        res.send(transactionHash);
+                                    });
+                });
+            }
+            else{
+                res.send('value is too low');
+            }
+        })
     },
 
     createRequest(req,res,next){

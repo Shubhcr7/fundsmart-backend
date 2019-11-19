@@ -5,4 +5,5 @@ module.exports=(app)=>{
     app.get('/getall',control.getDeployedCampaignf);
     app.get('/getall/:name',control.getDeployedCampaignCat);
     app.get('/getpop',control.getPopular);
+    app.get('/search/:name',control.searchCamp);
 }
