@@ -79,6 +79,15 @@ contract Campaign {
         request.approvalCount++;
     }
     
+    function checkApprover() public view returns(uint){
+        if(approvers[msg.sender]){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
 
