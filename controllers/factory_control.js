@@ -3,6 +3,7 @@ const http = require('http');
 const _=require('lodash');
 const Tx = require('ethereumjs-tx');
 const fs = require('fs-extra');
+const formidable = require('formidable');
 const fileUpload = require('express-fileupload');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCampf = require('../build/CampaignFactory.json');
@@ -14,9 +15,19 @@ var contract = new web3js.eth.Contract(contractABI, contractAddress);
 const moveFile=require('move-file');
 module.exports = {
     fileUploadi(req,res,next){
-        var prod_images1=req.files.image;
-        var newPath='../images/';
-        moveFile(prod_images1,newPath);
+        var form = new formidable.IncomingForm();
+
+    form.parse(req);
+
+    form.on('fileBegin', function (name, file){
+        file.path = __dirname + '/uploads/' + file.name;
+    });
+
+    form.on('file', function (name, file){
+        console.log('Uploaded ' + file.name);
+    });
+
+    res.sendFile(__dirname + '/index.html');
     },
 
     createCamp(req,res,next){
