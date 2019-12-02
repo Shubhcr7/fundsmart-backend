@@ -5,6 +5,7 @@ const bodyParser=require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(fileUpload());
 const factory_route=require('./routes/factory_route');
 factory_route(app);
 const camp_route=require('./routes/camp_route');
