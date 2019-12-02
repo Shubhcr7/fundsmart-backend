@@ -3,6 +3,7 @@ const http = require('http');
 const _=require('lodash');
 const Tx = require('ethereumjs-tx');
 const fs = require('fs-extra');
+const fileUpload = require('express-fileupload');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCampf = require('../build/CampaignFactory.json');
 const contractABI = JSON.parse(compiledCampf.interface);
@@ -53,10 +54,10 @@ module.exports = {
                                 .then(function (transactionHash) {
                                     if(transactionHash.status==true){
                                         var newPath='../images/name.jpg';
-                                        fs.rename(prod_images1,newPath, function (err) {
-                                            if (err) throw err
-                                            console.log('Successfully renamed - AKA moved!')
-                                          })
+                                        prod_images1.mv(newPath, function(err) {
+                                            if (err)
+                                              return res.status(500).send(err);
+                                          });
                                     }
                                     res.send(transactionHash);
                                 });
