@@ -15,6 +15,7 @@
     "express-fileupload": "^1.1.6",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
+    "move-file": "^1.2.0",
     "multer": "^1.4.2",
     "solc": "^0.4.25",
     "truffle-hdwallet-provider": "0.0.3",

@@ -11,14 +11,12 @@ const compiledCamp = require('../build/Campaign.json');
 const contractABIc = JSON.parse(compiledCamp.interface);
 var contractAddress = '0x322E9897ec8171B3DB7e142AB1F333BE702b58Ba';
 var contract = new web3js.eth.Contract(contractABI, contractAddress);
+const moveFile=require('move-file');
 module.exports = {
     fileUploadi(req,res,next){
-        var prod_images1=req.files.prod_images1;
-        var newPath='../images/name.jpg';
-        prod_images1.mv(newPath, function(err) {
-            if (err)
-            return res.status(500).send(err);
-        });
+        var prod_images1=req.files.image;
+        var newPath='../images/';
+        moveFile(prod_images1,newPath);
     },
 
     createCamp(req,res,next){
