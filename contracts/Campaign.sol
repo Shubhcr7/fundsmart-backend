@@ -4,7 +4,9 @@ contract CampaignFactory {
     address[] public deployedCampaigns;
 
     function createCampaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type) public {
-        address newCampaign = new Campaign(goal,minimum,name,about,idea,prod_desc,proj_type,msg.sender);
+        uint gl=goal*1000000000000000000;
+        uint mf=minimum*1000000000000000000;
+        address newCampaign = new Campaign(gl,mf,name,about,idea,prod_desc,proj_type,msg.sender);
         deployedCampaigns.push(newCampaign);
     }
 

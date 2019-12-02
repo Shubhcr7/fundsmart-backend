@@ -1,9 +1,10 @@
 const Web3=require('web3');
 const http = require('http');
+const multer = require('multer');
 const Tx = require('ethereumjs-tx').Transaction;
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const contractABI=[{"constant":false,"inputs":[{"name":"newMessage","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"message","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"initialMessage","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
-var contractAddress='0xb56F06043cc06c93BFBcD03E16a4e2C5b2595a0C';
+var contractAddress='0x322E9897ec8171B3DB7e142AB1F333BE702b58Ba';
 var contract=new web3js.eth.Contract(contractABI,contractAddress);
 module.exports={
 
@@ -30,5 +31,10 @@ module.exports={
         }).catch(function(err) {
             console.log(err);
         });
+    },
+
+    uploadI(req,res,next){
+        var DIR ='../images/';
+
     }
 }

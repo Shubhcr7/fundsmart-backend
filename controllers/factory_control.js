@@ -1,13 +1,13 @@
 const Web3 = require('web3');
 const http = require('http');
 const _=require('lodash');
-const Tx = require('ethereumjs-tx').Transaction;
+const Tx = require('ethereumjs-tx');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCampf = require('../build/CampaignFactory.json');
 const contractABI = JSON.parse(compiledCampf.interface);
 const compiledCamp = require('../build/Campaign.json');
 const contractABIc = JSON.parse(compiledCamp.interface);
-var contractAddress = '0x6eBb10Dda93790b0D5d5703e84288A7728a9C2Fc';
+var contractAddress = '0x322E9897ec8171B3DB7e142AB1F333BE702b58Ba';
 var contract = new web3js.eth.Contract(contractABI, contractAddress);
 module.exports = {
     
@@ -36,13 +36,15 @@ module.exports = {
                         var count;
                         web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function (v) {
                             count = v;
+                            var goal = req.body.goal;
+                            var minimum = req.body.funds;
                             var name = namec;
                             var about = req.body.about;
                             var idea = req.body.idea;
                             var prod_desc = req.body.prod_desc;
                             var proj_type = req.body.proj_type;
                             var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
-                            var rawT = { "from": 0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign((req.body.goal*Math.pow(10,18)).toString(),(req.body.funds*Math.pow(10,18)).toString(), name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
+                            var rawT = { "from": 0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal,minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
                             var transaction = new Tx(rawT, { chain: 'rinkeby', hardfork: 'petersburg' });
                             transaction.sign(privateKey);
                             web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))

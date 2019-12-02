@@ -1,6 +1,6 @@
 const Web3=require('web3');
 const http = require('http');
-const Tx = require('ethereumjs-tx').Transaction;
+const Tx = require('ethereumjs-tx');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCamp=require('../build/Campaign.json');
 const contractABIc=JSON.parse(compiledCamp.interface);
