@@ -14,20 +14,17 @@ var contractAddress = '0x322E9897ec8171B3DB7e142AB1F333BE702b58Ba';
 var contract = new web3js.eth.Contract(contractABI, contractAddress);
 const moveFile=require('move-file');
 module.exports = {
-    fileUploadi(req,res,next){
-        var form = new formidable.IncomingForm();
+    
+    setDetails(req,res,next){
+        process.env.acaddress = req.body.acaddress;
+        process.env.pk=req.body.pk;
+        res.send('success');
+    },
 
-    form.parse(req);
-
-    form.on('fileBegin', function (name, file){
-        file.path = __dirname + '/uploads/' + file.name;
-    });
-
-    form.on('file', function (name, file){
-        console.log('Uploaded ' + file.name);
-    });
-
-    res.sendFile(__dirname + '/index.html');
+    unsetDetails(req,res,next){
+        process.env.acaddress ="";
+        process.env.pk="";
+        res.send('success');
     },
 
     createCamp(req,res,next){
@@ -53,28 +50,35 @@ module.exports = {
                     arrd = _.find(arrd,{name:namec});
                     if(arrd==undefined){
                         var count;
-                        web3js.eth.getTransactionCount('0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259').then(function (v) {
+                        web3js.eth.getTransactionCount(process.env.acaddress).then(function (v) {
                             count = v;
-                            var goal = req.body.goal;
-                            var minimum = req.body.funds;
+                            var details=JSON.parse(req.body.details);
+                            var goal = details.goal;
+                            var minimum =details.funds;
                             var name = namec;
-                            var about = req.body.about;
-                            var idea = req.body.idea;
-                            var prod_desc = req.body.prod_desc;
-                            var proj_type = req.body.proj_type;
-                            var prod_images1=req.files.prod_images1;
-                            var privateKey = Buffer.from('ba69725568ff6674053b638b5a964ada3e7c5e0ef7d26f3b751d7faf9d5f9898', 'hex');
-                            var rawT = { "from": 0xb9bEb78AFD25A0a26E1fc6501e23E70F1B010259, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal,minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
+                            var about = details.about;
+                            var idea = details.idea;
+                            var prod_desc = details.prod_desc;
+                            var proj_type = details.proj_type;
+                            //var prod_images1=req.files.prod_images1;
+                            var privateKey = Buffer.from(process.env.pk, 'hex');
+                            var rawT = { "from":process.env.acaddress, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal,minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
                             var transaction = new Tx(rawT, { chain: 'rinkeby', hardfork: 'petersburg' });
                             transaction.sign(privateKey);
                             web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
                                 .then(function (transactionHash) {
                                     if(transactionHash.status==true){
-                                        var newPath='../images/name.jpg';
-                                        prod_images1.mv(newPath, function(err) {
-                                            if (err)
-                                              return res.status(500).send(err);
-                                          });
+                                        var file=req.files.image;
+                                        var filename=file.name;
+                                        const buildPath = '../images/'+name;
+                                        fs.removeSync(buildPath);
+                                        fs.ensureDirSync(buildPath);
+                                        const fl=buildPath+'/'+filename
+                                        file.mv(fl,function(err){
+                                            if(!err){
+                                                console.log('success');
+                                            }
+                                        })
                                     }
                                     res.send(transactionHash);
                                 });
@@ -93,6 +97,7 @@ module.exports = {
     getDeployedCampaignf(req, res, next) {
         var arr = [];
         var obj = {};
+        console.log(process.env.acaddress);
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
                 var func = async () => {
@@ -114,6 +119,41 @@ module.exports = {
                 func().then((arrd) => {
                     res.send(arrd);
                 });
+            })
+            .catch(function (err) {
+                res.send(err);
+            })
+    },
+
+    getManagerCampaign(req,res,next){
+        var arr = [];
+        var obj = {};
+        var i;
+        var address=req.params.address;
+        contract.methods.getDeployedCampaigns().call()
+            .then(function (adata) {
+                var func = async () => {
+                    console.log(adata.length);
+                    for (i = 0; i < adata.length && i < 12; i++) {
+                        var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
+                        obj.name = await contracti.methods.namec().call()
+                        obj.idea = await contracti.methods.ideac().call()
+                        obj.balance = await web3js.eth.getBalance(adata[i])/Math.pow(10,18);
+                        obj.goal = await contracti.methods.goalc().call()/Math.pow(10,18);
+                        obj.manager=await contracti.methods.manager().call();
+                        obj.proj_type = await contracti.methods.proj_typec().call();
+                        obj.address=adata[i];
+                        arr.push(obj);
+                        obj = {};
+                    }
+                    return arr;
+                }
+                func().then((arrd) => {
+                    arrd=_.filter(arrd, function(o) {
+                        return o.manager == address;
+                    })
+                    res.send(arrd);
+                })
             })
             .catch(function (err) {
                 res.send(err);
