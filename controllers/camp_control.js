@@ -153,13 +153,14 @@ module.exports={
         var acnt=data[2];
         var contract=new web3js.eth.Contract(contractABIc,addressc);
         var mgr=process.env.acaddress;
+        var obj={};
         var func=async()=>{
-            var manager=await contract.methods.manager().call();
-            return manager;
+            obj.manager=await contract.methods.manager().call();
+            obj.cnt=await contract.methods.approversCount().call();
+            return obj;
         }
-        func().then(function(manager){
-            var cnt=await contract.methods.approversCount().call();
-            if(manager==mgr && acnt>=(cnt)/2){
+        func().then(function(obj){
+            if(obj.manager==mgr && acnt>=(obj.cnt)/2){
                 web3js.eth.getTransactionCount(process.env.acaddress).then(function(v){
                     count=v;
                     var privateKey = Buffer.from(process.env.pk, 'hex');
