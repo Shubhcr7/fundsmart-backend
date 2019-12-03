@@ -262,7 +262,7 @@ module.exports = {
                 }
                 func().then((arrd) => {
                     arrd = _.find(arrd,function(o){
-                        return o.name.indexOf(namec)>-1;
+                        return o.name.includes(namec)===true;
                     });
                     if(arrd==undefined){
                         res.send('error');
