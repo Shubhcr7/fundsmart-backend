@@ -11,7 +11,7 @@ module.exports={
         var obj={};
         var func=async()=>{
             var contracti =await new web3js.eth.Contract(contractABIc, address);
-            obj.name = await contracti.methods.namec().callcon();
+            obj.name = await contracti.methods.namec().call();
             obj.about=await contracti.methods.aboutc().call();
             obj.prod_desc=await contracti.methods.prod_descc().call();
             obj.fl=await contracti.methods.fl().call();
