@@ -150,6 +150,7 @@ module.exports={
         var data = req.params.addressi.split("_");
         var index=data[1];
         var addressc=data[0];
+        var acnt=data[2];
         var contract=new web3js.eth.Contract(contractABIc,addressc);
         var mgr=process.env.acaddress;
         var func=async()=>{
@@ -157,8 +158,8 @@ module.exports={
             return manager;
         }
         func().then(function(manager){
-            
-            if(manager==mgr){
+            var cnt=await contract.methods.approversCount().call();
+            if(manager==mgr && acnt>=(cnt)/2){
                 web3js.eth.getTransactionCount(process.env.acaddress).then(function(v){
                     count=v;
                     var privateKey = Buffer.from(process.env.pk, 'hex');
