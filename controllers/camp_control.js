@@ -4,7 +4,7 @@ const Tx = require('ethereumjs-tx');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCamp=require('../build/Campaign.json');
 const contractABIc=JSON.parse(compiledCamp.interface);
-var contractAddress='0x6eBb10Dda93790b0D5d5703e84288A7728a9C2Fc';
+var contractAddress='0x28ada9D6A2b8197DBAFfB632Be928d096e0AD49F';
 module.exports={    
     getDeployedCampaignd(req,res,next){
         var address=req.params.address;
@@ -30,7 +30,7 @@ module.exports={
         var count;
         var address=req.params.address;
         var value=(req.body.value*Math.pow(10,18)).toString();
-        var contract=new web3js.eth.Contract(contractABIc,address)
+        var contract=new web3js.eth.Contract(contractABIc,address);
         var func=async()=>{
             var min=await contract.methods.minimumContribution().call();
             return min;
@@ -147,7 +147,7 @@ module.exports={
         var index=data[1];
         var addressc=data[0];
         var contract=new web3js.eth.Contract(contractABIc,addressc);
-        var mgr=process.env.acaddress
+        var mgr=process.env.acaddress;
         var func=async()=>{
             var manager=await contract.methods.manager().call();
             return manager;

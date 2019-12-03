@@ -10,7 +10,7 @@ const compiledCampf = require('../build/CampaignFactory.json');
 const contractABI = JSON.parse(compiledCampf.interface);
 const compiledCamp = require('../build/Campaign.json');
 const contractABIc = JSON.parse(compiledCamp.interface);
-var contractAddress = '0x322E9897ec8171B3DB7e142AB1F333BE702b58Ba';
+var contractAddress = '0x28ada9D6A2b8197DBAFfB632Be928d096e0AD49F';
 var contract = new web3js.eth.Contract(contractABI, contractAddress);
 const moveFile=require('move-file');
 module.exports = {
@@ -60,20 +60,19 @@ module.exports = {
                             var idea = details.idea;
                             var prod_desc = details.prod_desc;
                             var proj_type = details.proj_type;
-                            //var prod_images1=req.files.prod_images1;
+                            var file=req.files.image;
+                            var filename=file.name;
+                            const buildPath = './images/'+name;
+                            fs.ensureDirSync(buildPath);
+                            const fl=buildPath+'/'+filename
                             var privateKey = Buffer.from(process.env.pk, 'hex');
-                            var rawT = { "from":process.env.acaddress, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal,minimum, name, about, idea, prod_desc, proj_type).encodeABI(), "nonce": web3js.utils.toHex(count) };
+                            var rawT = { "from":process.env.acaddress, "to": contractAddress, "value": "0x0", "gasPrice": web3js.utils.toHex(20 * 1e9), "gasLimit": web3js.utils.toHex(2100000), "data": contract.methods.createCampaign(goal,minimum, name, about, idea, prod_desc, proj_type , fl).encodeABI(), "nonce": web3js.utils.toHex(count) };
                             var transaction = new Tx(rawT, { chain: 'rinkeby', hardfork: 'petersburg' });
                             transaction.sign(privateKey);
                             web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
                                 .then(function (transactionHash) {
                                     if(transactionHash.status==true){
-                                        var file=req.files.image;
-                                        var filename=file.name;
-                                        const buildPath = '../images/'+name;
-                                        fs.removeSync(buildPath);
-                                        fs.ensureDirSync(buildPath);
-                                        const fl=buildPath+'/'+filename
+                                        
                                         file.mv(fl,function(err){
                                             if(!err){
                                                 console.log('success');
@@ -97,7 +96,6 @@ module.exports = {
     getDeployedCampaignf(req, res, next) {
         var arr = [];
         var obj = {};
-        console.log(process.env.acaddress);
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
                 var func = async () => {

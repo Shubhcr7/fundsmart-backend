@@ -3,10 +3,10 @@ pragma solidity ^0.4.17;
 contract CampaignFactory {
     address[] public deployedCampaigns;
 
-    function createCampaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type) public {
+    function createCampaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type, string fl) public {
         uint gl=goal*1000000000000000000;
         uint mf=minimum*1000000000000000000;
-        address newCampaign = new Campaign(gl,mf,name,about,idea,prod_desc,proj_type,msg.sender);
+        address newCampaign = new Campaign(gl,mf,name,about,idea,prod_desc,proj_type,fl,msg.sender);
         deployedCampaigns.push(newCampaign);
     }
 
@@ -32,6 +32,7 @@ contract Campaign {
     mapping(address => bool) public approvers;
     uint public approversCount;
     string public namec;
+    string fl;
     string public aboutc;
     string public ideac;
     string public prod_descc;
@@ -41,9 +42,10 @@ contract Campaign {
         _;
     }
 
-    function Campaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type,address creator) public {
+    function Campaign(uint goal,uint minimum,string name,string about,string idea,string prod_desc,string proj_type,string flc,address creator) public {
         manager = creator;
         goalc=goal;
+        fl=flc;
         minimumContribution = minimum;
         ideac=idea;
         aboutc=about;
@@ -93,7 +95,7 @@ contract Campaign {
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
 
-        require(request.approvalCount > (approversCount / 2));
+        require(request.approvalCount >= (approversCount / 2));
         require(!request.complete);
 
         request.recipient.transfer(request.value);
