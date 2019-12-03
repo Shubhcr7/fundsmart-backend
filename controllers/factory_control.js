@@ -62,7 +62,7 @@ module.exports = {
                             var proj_type = details.proj_type;
                             var file=req.files.image;
                             var filename=file.name;
-                            const buildPath = './images/'+name;
+                            const buildPath = '../PROJECT/src/assets/images/'+name;
                             fs.ensureDirSync(buildPath);
                             const fl=buildPath+'/'+filename
                             var privateKey = Buffer.from(process.env.pk, 'hex');
