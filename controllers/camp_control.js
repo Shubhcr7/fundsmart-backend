@@ -12,6 +12,7 @@ module.exports={
         var func=async()=>{
             var contracti =await new web3js.eth.Contract(contractABIc, address);
             obj.name = await contracti.methods.namec().call()
+            obj.fl=await contracti.methods.fl().call();
             obj.min=await contracti.methods.minimumContribution().call()/Math.pow(10,18);
             obj.idea = await contracti.methods.ideac().call()
             obj.balance = await web3js.eth.getBalance(address)/Math.pow(10,18);
