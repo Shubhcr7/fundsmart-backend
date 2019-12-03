@@ -4,15 +4,18 @@ const Tx = require('ethereumjs-tx');
 const web3js = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/7386bdf0b20e48db9a9d4eb445bb1803"));
 const compiledCamp=require('../build/Campaign.json');
 const contractABIc=JSON.parse(compiledCamp.interface);
-var contractAddress='0x6B78Fb399616d5404c37aB9650377226f534ab29';
+var contractAddress='0x6B78Fb399616d5404c37aB9650377226f534ab2';
 module.exports={    
     getDeployedCampaignd(req,res,next){
         var address=req.params.address;
         var obj={};
         var func=async()=>{
             var contracti =await new web3js.eth.Contract(contractABIc, address);
-            obj.name = await contracti.methods.namec().call()
+            obj.name = await contracti.methods.namec().callcon();
+            obj.about=await contracti.methods.aboutc().call();
+            obj.prod_desc=await contracti.methods.prod_descc().call();
             obj.fl=await contracti.methods.fl().call();
+            obj.count=await contracti.methods.approversCount().call();
             obj.min=await contracti.methods.minimumContribution().call()/Math.pow(10,18);
             obj.idea = await contracti.methods.ideac().call()
             obj.balance = await web3js.eth.getBalance(address)/Math.pow(10,18);
