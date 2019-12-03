@@ -261,7 +261,9 @@ module.exports = {
                     return arri;
                 }
                 func().then((arrd) => {
-                    arrd = _.find(arrd,{name:namec});
+                    arrd = _.find(arrd,function(o){
+                        return o.name.includes(namec);
+                    });
                     if(arrd==undefined){
                         res.send('error');
                     }
