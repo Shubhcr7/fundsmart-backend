@@ -132,7 +132,6 @@ module.exports = {
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
                 var func = async () => {
-                    console.log(adata.length);
                     for (i = 0; i < adata.length && i < 12; i++) {
                         var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
                         obj.name = await contracti.methods.namec().call();
@@ -168,7 +167,6 @@ module.exports = {
         contract.methods.getDeployedCampaigns().call()
             .then(function (adata) {
                 var func = async () => {
-                    console.log(adata.length);
                     for (i = 0; i < adata.length && i < 12; i++) {
                         var contracti = await new web3js.eth.Contract(contractABIc, adata[i]);
                         obj.name = await contracti.methods.namec().call();

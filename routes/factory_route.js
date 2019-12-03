@@ -2,7 +2,7 @@ const {app}=require('../admin.js');
 const control=require('../controllers/factory_control.js');
 module.exports=(app)=>{
     app.post('/login',control.setDetails);
-    app.post('/logout',control.unsetDetails);
+    app.get('/logout',control.unsetDetails);
     app.post('/createcampaign',control.createCamp);
     app.get('/getmy/:address',control.getManagerCampaign);
     app.get('/getall',control.getDeployedCampaignf);
