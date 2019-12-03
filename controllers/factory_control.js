@@ -149,7 +149,7 @@ module.exports = {
                 }
                 func().then((arrd) => {
                     arrd=_.filter(arrd, function(o) {
-                        return o.manager == address;
+                        return o.manager === address;
                     })
                     res.send(arrd);
                 })
