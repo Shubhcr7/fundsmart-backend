@@ -32,7 +32,7 @@ contract Campaign {
     mapping(address => bool) public approvers;
     uint public approversCount;
     string public namec;
-    string fl;
+    string public fl;
     string public aboutc;
     string public ideac;
     string public prod_descc;
